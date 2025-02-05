@@ -11,3 +11,5 @@
 5. Si intentas sortear con menos de **2 nombres**, aparecerá un **mensaje de error** indicando que necesitas más participantes.  
 
 ✨ ¡Diviértete descubriendo quién es el amigo secreto! 🎉  
+
+<a target="__blank" href="https://amigo-secreto-ecru-eight.vercel.app/"> Pruebalo </a>
