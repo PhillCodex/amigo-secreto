@@ -13,4 +13,4 @@
 ✨ ¡Diviértete descubriendo quién es el amigo secreto! 🎉  
 
 # ¡Haz la prueba!
-[Pruébalo](https://amigo-secreto-ecru-eight.vercel.app/) (se abrirá en una nueva pestaña)
+[Pruébalo](https://amigo-secreto-ecru-eight.vercel.app/)
