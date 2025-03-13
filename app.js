@@ -52,6 +52,9 @@ function iniciarSorteo() {
     let contador = 0;
     const duracion = 4000; // 5 segundos
     
+    // sonido de ruleta
+    sonidoRuleta.volume = 0.2; // 50% de volumen
+
     // Reiniciar y reproducir el sonido
     sonidoRuleta.currentTime = 0; // Reiniciar al inicio
     sonidoRuleta.play();
