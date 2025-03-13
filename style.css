@@ -180,6 +180,12 @@ ul {
     margin-top: 10px;
 }
 
+.icono-reset {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .button-reset:hover {
     background-color: #e04e4e;
 }
