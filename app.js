@@ -1,92 +1,102 @@
-// Detectar la tecla "Enter" en el input
-document.getElementById("amigo").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        agregarAmigo();
-    }
-});
-const inputAmigo = document.getElementById("amigo");
-const sonidoTeclado = document.getElementById("sonidoTeclado");
-
-let timer; // Temporizador para controlar la pausa del audio
-
-inputAmigo.addEventListener("input", function () {
-    // Iniciar el sonido cuando el usuario comienza a escribir
-    if (sonidoTeclado.paused) {
-        sonidoTeclado.currentTime = 0; // Reiniciar desde el inicio
-        sonidoTeclado.play();
-    }
-
-    // Detener el sonido después de 1 segundo sin escribir
-    clearTimeout(timer); // Reinicia el temporizador
-    timer = setTimeout(() => {
-        sonidoTeclado.pause();
-    }, 100); // 1000ms = 1 segundo
-});
-
-// Lista donde almacenan los nombres de los amigos
+let intervalo;
+let animacionActiva = false;
 let amigos = [];
+const sonidoRuleta = document.getElementById('sonidoRuleta');
 
-// Función para agregar un amigo a la lista
+document.getElementById("amigo").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") agregarAmigo();
+});
+
 function agregarAmigo() {
-    let inputAmigo = document.getElementById("amigo");
-    let nombre = inputAmigo.value.trim();
+    const inputAmigo = document.getElementById("amigo");
+    const nombre = inputAmigo.value.trim();
+    const error = document.getElementById('error');
 
-    let error = document.getElementById('error');
-
-    // Validar que el nombre no esté vacío
-    if (nombre === "") {
-        error.textContent = "⚠️ Por favor, escribe un nombre antes de presionar Añadir";
-    } else if (/^\d+$/.test(nombre)) {
-        error.textContent = "⚠️ No se permiten solo números como nombre";
-    } else if (/^\d/.test(nombre)) {
-        error.textContent = "⚠️ No se permiten nombres que comiencen con un número";
+    if (!nombre) {
+        error.textContent = "⚠️ Escribe un nombre válido";
     } else if (amigos.includes(nombre)) {
-        error.textContent = "⚠️ Este nombre ya fue añadido";
+        error.textContent = "⚠️ Nombre ya existe";
     } else {
         amigos.push(nombre);
         inputAmigo.value = "";
         actualizarLista();
-        error.textContent = ""; // Limpiar error si el nombre es válido
-    }
-
-    setTimeout(() => {
         error.textContent = "";
-    }, 3000);
+    }
 }
 
-// Función para actualizar la lista en el HTML
 function actualizarLista() {
-    let lista = document.getElementById("listaAmigos");
+    const lista = document.getElementById("listaAmigos");
     lista.innerHTML = "";
-
-    amigos.forEach((nombre) => {
-        let li = document.createElement("li");
-        li.textContent = nombre;
+    amigos.forEach(nombre => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${nombre}
+            <button class="remove-btn" onclick="eliminarAmigo('${nombre}')">&times;</button>
+        `;
+        const colores = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+        li.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
         lista.appendChild(li);
     });
 }
 
-// Función para seleccionar un amigo aleatorio
-function sortearAmigo() {
-    let error = document.getElementById('error');
-
-    if (amigos.length < 2) {
-        error.textContent = "⚠️ Debe haber al menos 2 nombres para sortear";
-    } else {
-        let indiceAleatorio = Math.floor(Math.random() * amigos.length);
-        let amigoSeleccionado = amigos[indiceAleatorio];
-        let resultadoLista = document.getElementById("resultado");
-        resultadoLista.innerHTML = `<li>El amigo seleccionado es: <strong>🎉${amigoSeleccionado}</strong></li>`;
-    }
-
-    setTimeout(() => {
-        error.textContent = "";
-    }, 3000);
+function eliminarAmigo(nombre) {
+    amigos = amigos.filter(a => a !== nombre);
+    actualizarLista();
 }
 
-// Nueva función para reiniciar la lista
-function reiniciarLista() {
+function iniciarSorteo() {
+    if (animacionActiva) return;
+    animacionActiva = true;
+    
+    const display = document.getElementById("nombreGanador");
+    let contador = 0;
+    const duracion = 4000; // 5 segundos
+    
+    // Reiniciar y reproducir el sonido
+    sonidoRuleta.currentTime = 0; // Reiniciar al inicio
+    sonidoRuleta.play();
+    
+    intervalo = setInterval(() => {
+        display.textContent = amigos[Math.floor(Math.random() * amigos.length)];
+        display.style.animation = 'none';
+        void display.offsetWidth; // Reiniciar animación
+        display.style.animation = 'aparece 0.2s';
+    }, 100);
+    
+    setTimeout(() => {
+        clearInterval(intervalo);
+        const ganador = amigos[Math.floor(Math.random() * amigos.length)];
+        display.textContent = `🎉 ${ganador} 🎉`;
+        setTimeout(() => {
+            sonidoRuleta.pause(); // Pausar el sonido después de 0.5 segundos
+            sonidoRuleta.currentTime = 0; // Reiniciar el audio
+            animacionActiva = false;
+        }, 500); // 0.5 segundos adicionales
+    }, duracion);
+}
+
+function mostrarVentana() {
+    if (amigos.length < 2) {
+        mostrarError("⚠️ Mínimo 2 participantes");
+        return;
+    }
+    document.getElementById("ventanaTragamonedas").style.display = 'flex';
+    iniciarSorteo();
+}
+
+function reiniciarTodo() {
     amigos = [];
     actualizarLista();
-    document.getElementById("resultado").innerHTML = ""; // Limpiar resultado
+    cerrarVentana();
+    document.getElementById("amigo").value = "";
+    sonidoRuleta.pause(); // Asegurarse de que el sonido se detenga al reiniciar
+    sonidoRuleta.currentTime = 0; // Reiniciar el audio
+}
+
+function cerrarVentana() {
+    document.getElementById("ventanaTragamonedas").style.display = 'none';
+    clearInterval(intervalo);
+    sonidoRuleta.pause(); // Detener el sonido al cerrar
+    sonidoRuleta.currentTime = 0; // Reiniciar el audio
+    animacionActiva = false;
 }
