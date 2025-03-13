@@ -4,6 +4,24 @@ document.getElementById("amigo").addEventListener("keydown", function(event) {
         agregarAmigo();
     }
 });
+const inputAmigo = document.getElementById("amigo");
+const sonidoTeclado = document.getElementById("sonidoTeclado");
+
+let timer; // Temporizador para controlar la pausa del audio
+
+inputAmigo.addEventListener("input", function () {
+    // Iniciar el sonido cuando el usuario comienza a escribir
+    if (sonidoTeclado.paused) {
+        sonidoTeclado.currentTime = 0; // Reiniciar desde el inicio
+        sonidoTeclado.play();
+    }
+
+    // Detener el sonido después de 1 segundo sin escribir
+    clearTimeout(timer); // Reinicia el temporizador
+    timer = setTimeout(() => {
+        sonidoTeclado.pause();
+    }, 100); // 1000ms = 1 segundo
+});
 
 // Lista donde almacenan los nombres de los amigos
 let amigos = [];
